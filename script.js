@@ -104,25 +104,38 @@ function adicionarMensagem(texto, remetente) {
     corpoChat.scrollTop = corpoChat.scrollHeight;
 }
 
-async function processarMensagem(texto) {
-    if (!texto.trim()) return;
+async function processarQueryUsuario(textoUsuario) {
+    // ... (Partes visuais: muda tela, mostra balão do usuário) ...
 
-    // Se for a primeira interação, muda para a Tela 2
-    iniciarModoChatCompleto();
+    try {
+        
+        // 1. O Carteiro (fetch)
+        const response = await fetch('/api/chat', {
+            
+            // 2. O Método (POST)
+            method: 'POST', 
+            
+            // 3. O Envelope (Headers)
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            
+            // 4. A Carta (Body)
+            body: JSON.stringify({ message: textoUsuario })
+        });
 
-    adicionarMensagem(texto, 'user');
-    inputUsuario.value = '';
-    
-    // Simulação de resposta
-    inputUsuario.disabled = true;
-    await new Promise(r => setTimeout(r, 1000));
-    
-    let resposta = "Entendi! Você disse: " + texto;
-    // Aqui viria sua lógica de switch/case ou API
-    
-    adicionarMensagem(resposta, 'bot');
-    inputUsuario.disabled = false;
-    inputUsuario.focus();
+        // 5. A Espera (Await)
+        const data = await response.json();
+        
+        // 6. A Entrega
+        adicionarMensagem(data.reply, 'bot');
+
+    } catch (error) {
+        // Se a internet cair ou o servidor der erro, cai aqui.
+        console.error("Erro:", error);
+        adicionarMensagem("Ops! Estou sem conexão.", 'bot');
+    }
+
 }
 
 /* --- Listeners --- */
